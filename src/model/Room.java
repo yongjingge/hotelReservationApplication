@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Objects;
+
 public class Room implements IRoom {
 
     private String roomNumber;
@@ -47,5 +49,20 @@ public class Room implements IRoom {
     @Override
     public String toString() {
         return "Room " + roomNumber + "\nroom price " + roomPrice + " per night\n" + "room type " + roomType + "\n";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof Room) {
+            Room that = (Room) o;
+            return roomNumber.equals(that.roomNumber) && roomPrice.equals(that.roomPrice) && roomType.equals(that.roomType);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(roomNumber, roomPrice, roomType);
     }
 }

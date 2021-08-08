@@ -2,6 +2,7 @@ package model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 public class Reservation {
 
@@ -21,6 +22,24 @@ public class Reservation {
     @Override
     public String toString() {
         return "Name:\n" + customer.getFirstName() + " " + customer.getLastName() + "\n" + "Room:\n" + room + "starts on " + formatter.format(checkInDate) + "\nends on " + formatter.format(checkOutDate) + "\n";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof Reservation) {
+            Reservation that = (Reservation) o;
+            return Objects.equals(customer, that.customer)
+                    && Objects.equals(room, that.room)
+                    && Objects.equals(checkInDate, that.checkInDate)
+                    && Objects.equals(checkOutDate, that.checkOutDate);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(customer, room, checkInDate, checkOutDate);
     }
 
     public Customer getCustomer() {
