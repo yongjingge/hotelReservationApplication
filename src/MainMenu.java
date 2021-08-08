@@ -77,15 +77,16 @@ public class MainMenu {
         HotelResource hotelResource = HotelResource.getInstance();
         Date checkIn = getCheckInDate();
         Date checkOut = getCheckOutDate(checkIn);
-        Collection<IRoom> roomsAvailableOnRequest = hotelResource.findARoom(checkIn, checkOut);
+        Collection<IRoom> roomsAvailableOnRequest = new HashSet<>(hotelResource.findARoom(checkIn, checkOut));
+        Collection<IRoom> roomsAvailableSevenDaysAdded = new HashSet<>(hotelResource.findARoom(addSevenDays(checkIn), addSevenDays(checkOut)));
 
         // system based on the dates will list the rooms available for reservation
         if (! roomsAvailableOnRequest.isEmpty()) {
             System.out.println("Rooms available in your selected dates\n");
             roomsAvailableOnRequest.forEach(System.out::println);
-        } else if (! hotelResource.findARoom(addSevenDays(checkIn), addSevenDays(checkOut)).isEmpty()) {
-            System.out.println("Rooms available seven days later of your selected dates");
-            hotelResource.findARoom(addSevenDays(checkIn), addSevenDays(checkOut)).forEach(System.out::println);
+        } else if (! roomsAvailableSevenDaysAdded.isEmpty()) {
+            System.out.println("Rooms available seven days later of your selected dates\n");
+            roomsAvailableSevenDaysAdded.forEach(System.out::println);
         } else {
             System.out.println("No rooms available in your selected days");
             startActions();

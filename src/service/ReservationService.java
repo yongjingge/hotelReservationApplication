@@ -46,19 +46,20 @@ public class ReservationService {
         return newReservation;
     }
 
-    private boolean dateConflict(Date checkInDate, Date checkOutDate, Reservation reservation) {
+    /* default access modifier example */
+    boolean dateConflict(Date checkInDate, Date checkOutDate, Reservation reservation) {
         return checkInDate.before(reservation.getCheckOutDate()) ||
                 checkOutDate.after(reservation.getCheckInDate());
     }
 
     public Collection<IRoom> findRooms(Date checkInDate, Date checkOutDate) {
-        List<IRoom> roomList = new ArrayList<>(roomMap.values());
+        Collection<IRoom> availableRooms = getAllRooms();
         for (Reservation r : reservationSet) {
             if (dateConflict(checkInDate, checkOutDate, r)) {
-                roomList.remove(r.getRoom());
+                availableRooms.remove(r.getRoom());
             }
         }
-        return roomList;
+        return availableRooms;
     }
 
     public Collection<Reservation> getCustomersReservationFromCustomer(Customer customer) {
