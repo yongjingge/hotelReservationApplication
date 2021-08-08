@@ -192,48 +192,6 @@ public class MainMenu {
             }
             keepAsking = false;
         }
-
-//        try (Scanner sc = new Scanner(System.in)) {
-//            while (keepAsking) {
-//                try {
-//                    System.out.println(prints[0]);
-//                    String inputDate = getNextLine(sc);
-//                    checkIn = formatter.parse(inputDate);
-//                } catch (Exception ex) {
-//                    System.out.println("Invalid input! " + ex.getLocalizedMessage());
-//                }
-//                assert checkIn != null;
-//                if (checkIn.before(new Date())) {
-//                    System.out.println(prints[1]);
-//                    continue;
-//                }
-//                keepAsking = false;
-//            }
-//        }
-
-
-
-//        try {
-//            Scanner sc = new Scanner(System.in);
-//            while (keepAsking) {
-//                try {
-//                    System.out.println(prints[0]);
-//                    String inputDate = getNextLine(sc);
-//                    checkIn = new SimpleDateFormat("MM/dd/yyyy").parse(inputDate);
-//                } catch (ParseException ex) {
-//                    System.out.println("Invalid input! " + ex.getLocalizedMessage());
-//                    continue;
-//                }
-//                assert checkIn != null;
-//                if (checkIn.before(new Date())) {
-//                    System.out.println(prints[1]);
-//                    continue;
-//                }
-//                keepAsking = false;
-//            }
-//        } catch (Exception ex) {
-//            System.out.println(ex.getLocalizedMessage());
-//        }
         return checkIn;
     }
 
