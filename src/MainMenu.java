@@ -123,7 +123,9 @@ public class MainMenu {
             String validRoomNumberInput = getRoomNumberValid("what room number would you like to reserve", checkIn, checkOut, priceTypeRes);
 
             // make a new reservation and display it
-            Reservation newReservation = !roomsAvailableOnRequest.isEmpty() ? hotelResource.bookARoom(userEmailInput, hotelResource.getRoom(validRoomNumberInput), checkIn, checkOut) : hotelResource.bookARoom(userEmailInput, hotelResource.getRoom(validRoomNumberInput), addSevenDays(checkIn), addSevenDays(checkOut));
+            Reservation newReservation = !roomsAvailableOnRequest.isEmpty() ?
+                    hotelResource.bookARoom(userEmailInput, hotelResource.getRoom(validRoomNumberInput), checkIn, checkOut) :
+                    hotelResource.bookARoom(userEmailInput, hotelResource.getRoom(validRoomNumberInput), addSevenDays(checkIn), addSevenDays(checkOut));
             System.out.println(newReservation);
         } else {
             // answer 'n' to the question: would u like to book a room --> go back to the main menu
