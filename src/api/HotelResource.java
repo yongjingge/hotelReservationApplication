@@ -42,8 +42,8 @@ public class HotelResource {
         return reservationService.getCustomersReservationFromCustomer(customerService.getCustomer(customerEmail));
     }
 
-    public Collection<IRoom> findARoom(Date checkIn, Date checkOut) {
-        return reservationService.findRooms(checkIn, checkOut);
+    public Collection<IRoom> findARoom(Date checkIn, Date checkOut, String priceType) {
+        return reservationService.findRooms(checkIn, checkOut, priceType);
     }
 
 }

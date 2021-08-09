@@ -65,7 +65,7 @@ public class MainMenu {
     /**
      * Case 1 - find and reserve a room action
      * workflow:
-     *  get user's input of check-in/out dates
+     *  get user's input of check-in/out dates and room-price choice
      *  --> find a room, if no rooms available, try to add 7 days to the input dates and display rooms
      *  --> confirm their willingness to book a room, if not, go back to the startActions method
      *  --> check if user has an account, if not, go to case 3 action
@@ -77,8 +77,9 @@ public class MainMenu {
         HotelResource hotelResource = HotelResource.getInstance();
         Date checkIn = getCheckInDate();
         Date checkOut = getCheckOutDate(checkIn);
-        Collection<IRoom> roomsAvailableOnRequest = new HashSet<>(hotelResource.findARoom(checkIn, checkOut));
-        Collection<IRoom> roomsAvailableSevenDaysAdded = new HashSet<>(hotelResource.findARoom(addSevenDays(checkIn), addSevenDays(checkOut)));
+        String priceTypeRes = getPriceType();
+        Collection<IRoom> roomsAvailableOnRequest = new HashSet<>(hotelResource.findARoom(checkIn, checkOut, priceTypeRes));
+        Collection<IRoom> roomsAvailableSevenDaysAdded = new HashSet<>(hotelResource.findARoom(addSevenDays(checkIn), addSevenDays(checkOut), priceTypeRes));
 
         // system based on the dates will list the rooms available for reservation
         if (! roomsAvailableOnRequest.isEmpty()) {
@@ -117,7 +118,7 @@ public class MainMenu {
 
             // continue reservations with the email get from above
             // "what room number would you like to reserve"
-            String validRoomNumberInput = getRoomNumberValid("what room number would you like to reserve", checkIn, checkOut);
+            String validRoomNumberInput = getRoomNumberValid("what room number would you like to reserve", checkIn, checkOut, priceTypeRes);
 
             // make a new reservation and display it
             Reservation newReservation = hotelResource.bookARoom(userEmailInput, hotelResource.getRoom(validRoomNumberInput), checkIn, checkOut);
@@ -312,6 +313,41 @@ public class MainMenu {
         return adminResource.getCustomer(email);
     }
 
+    /* get a price type from user to make reservations, will return a number choice */
+    private String getPriceType() {
+        boolean keepAsking = true;
+        String res = "";
+        int checkRes = -1;
+        while (keepAsking) {
+            try {
+                Scanner sc = new Scanner(System.in);
+                System.out.println("""
+                        Which type of room would you like to book?
+                        enter 1 for paid rooms
+                        enter 2 for free rooms
+                        enter 3 for all rooms
+                        please enter your choice
+                        """);
+                res = sc.nextLine();
+                checkRes = Integer.parseInt(res);
+                if (! (checkRes == 1 || checkRes == 2 || checkRes == 3)) {
+                    System.out.println("Please choose from provided options");
+                    continue;
+                }
+            } catch (Exception ex) {
+                System.out.println("Invalid input! " + ex.getLocalizedMessage());
+            }
+            keepAsking = false;
+        }
+        if (checkRes == 1) {
+            return "paid";
+        } else if (checkRes == 2) {
+            return "free";
+        } else {
+            return "all";
+        }
+    }
+
     /* get valid name inputs from user */
     private String getName(String msg) {
         boolean keepAsking = true;
@@ -340,7 +376,7 @@ public class MainMenu {
     }
 
     /* get a valid room number for reservation */
-    private String getRoomNumberValid(String msg, Date checkIn, Date checkOut) {
+    private String getRoomNumberValid(String msg, Date checkIn, Date checkOut, String priceType) {
         boolean keepAsking = true;
         String res = "";
         HotelResource hotelResource = HotelResource.getInstance();
@@ -353,11 +389,11 @@ public class MainMenu {
                     System.out.println("Room does not exist, please try again");
                     continue;
                 }
-                if (hotelResource.findARoom(checkIn, checkOut).isEmpty()) {
+                if (hotelResource.findARoom(checkIn, checkOut,priceType).isEmpty()) {
                     System.out.println("No room available, please try again");
                     continue;
                 }
-                Set<IRoom> roomsAvailable = new HashSet<>(hotelResource.findARoom(checkIn, checkOut));
+                Set<IRoom> roomsAvailable = new HashSet<>(hotelResource.findARoom(checkIn, checkOut, priceType));
                 if (! roomsAvailable.contains(hotelResource.getRoom(res))) {
                     System.out.println("The room you selected is not available, please try again");
                     continue;

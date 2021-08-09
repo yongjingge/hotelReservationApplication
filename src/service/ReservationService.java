@@ -48,16 +48,35 @@ public class ReservationService {
 
     /* default access modifier example */
     boolean dateConflict(Date checkInDate, Date checkOutDate, Reservation reservation) {
-        return checkInDate.before(reservation.getCheckOutDate()) ||
+        return checkInDate.before(reservation.getCheckOutDate()) &&
                 checkOutDate.after(reservation.getCheckInDate());
     }
 
-    public Collection<IRoom> findRooms(Date checkInDate, Date checkOutDate) {
+    /* used inside this class to find rooms available with provided check-n/out dates, price type is not checked */
+    private Collection<IRoom> findRooms(Date checkInDate, Date checkOutDate) {
         Collection<IRoom> availableRooms = getAllRooms();
+        List<IRoom> res = new ArrayList<>(availableRooms);
+        if (reservationSet.isEmpty()) {
+            return res;
+        }
         for (Reservation r : reservationSet) {
             if (dateConflict(checkInDate, checkOutDate, r)) {
-                availableRooms.remove(r.getRoom());
+                res.remove(r.getRoom());
             }
+        }
+        return res;
+    }
+
+    /* this method will include options of free, paid, all for room reservations */
+    public Collection<IRoom> findRooms(Date checkInDate, Date checkOutDate, String priceType) {
+        Collection<IRoom> availableRooms = new ArrayList<>(findRooms(checkInDate, checkOutDate));
+        if (priceType.equals("all")) {
+            return availableRooms;
+        }
+        if (priceType.equals("paid")) {
+            availableRooms.removeIf(room -> room.isFree());
+        } else if (priceType.equals("free")) {
+            availableRooms.removeIf(room -> !room.isFree());
         }
         return availableRooms;
     }
