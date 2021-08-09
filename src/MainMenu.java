@@ -78,18 +78,21 @@ public class MainMenu {
         Date checkIn = getCheckInDate();
         Date checkOut = getCheckOutDate(checkIn);
         String priceTypeRes = getPriceType();
-        Collection<IRoom> roomsAvailableOnRequest = new HashSet<>(hotelResource.findARoom(checkIn, checkOut, priceTypeRes));
-        Collection<IRoom> roomsAvailableSevenDaysAdded = new HashSet<>(hotelResource.findARoom(addSevenDays(checkIn), addSevenDays(checkOut), priceTypeRes));
+        final Collection<IRoom> roomsAvailableOnRequest = new HashSet<>(hotelResource.findARoom(checkIn, checkOut, priceTypeRes));
+        final Collection<IRoom> roomsAvailableSevenDaysAdded = new HashSet<>(hotelResource.findARoom(addSevenDays(checkIn), addSevenDays(checkOut), priceTypeRes));
 
         // system based on the dates will list the rooms available for reservation
         if (! roomsAvailableOnRequest.isEmpty()) {
             System.out.println("Rooms available in your selected dates\n");
             roomsAvailableOnRequest.forEach(System.out::println);
         } else if (! roomsAvailableSevenDaysAdded.isEmpty()) {
-            System.out.println("Rooms available seven days later of your selected dates\n");
+            System.out.println("""
+                    No rooms available in your selected dates
+                    We have rooms available seven day later of your selected dates
+                    """);
             roomsAvailableSevenDaysAdded.forEach(System.out::println);
         } else {
-            System.out.println("No rooms available in your selected days");
+            System.out.println("No rooms available in your selected days\n");
             startActions();
         }
 
@@ -117,11 +120,10 @@ public class MainMenu {
             }
 
             // continue reservations with the email get from above
-            // "what room number would you like to reserve"
             String validRoomNumberInput = getRoomNumberValid("what room number would you like to reserve", checkIn, checkOut, priceTypeRes);
 
             // make a new reservation and display it
-            Reservation newReservation = hotelResource.bookARoom(userEmailInput, hotelResource.getRoom(validRoomNumberInput), checkIn, checkOut);
+            Reservation newReservation = !roomsAvailableOnRequest.isEmpty() ? hotelResource.bookARoom(userEmailInput, hotelResource.getRoom(validRoomNumberInput), checkIn, checkOut) : hotelResource.bookARoom(userEmailInput, hotelResource.getRoom(validRoomNumberInput), addSevenDays(checkIn), addSevenDays(checkOut));
             System.out.println(newReservation);
         } else {
             // answer 'n' to the question: would u like to book a room --> go back to the main menu
@@ -389,12 +391,13 @@ public class MainMenu {
                     System.out.println("Room does not exist, please try again");
                     continue;
                 }
-                if (hotelResource.findARoom(checkIn, checkOut,priceType).isEmpty()) {
+                final Set<IRoom> roomsAvailable = new HashSet<>(hotelResource.findARoom(checkIn, checkOut, priceType));
+                final Set<IRoom> roomsAvailableSevenDaysLater = new HashSet<>(hotelResource.findARoom(addSevenDays(checkIn), addSevenDays(checkOut), priceType));
+                if (roomsAvailable.isEmpty() && roomsAvailableSevenDaysLater.isEmpty()) {
                     System.out.println("No room available, please try again");
                     continue;
                 }
-                Set<IRoom> roomsAvailable = new HashSet<>(hotelResource.findARoom(checkIn, checkOut, priceType));
-                if (! roomsAvailable.contains(hotelResource.getRoom(res))) {
+                if (!roomsAvailable.contains(hotelResource.getRoom(res)) && !roomsAvailableSevenDaysLater.contains(hotelResource.getRoom(res))) {
                     System.out.println("The room you selected is not available, please try again");
                     continue;
                 }
