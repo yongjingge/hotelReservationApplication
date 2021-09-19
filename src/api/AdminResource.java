@@ -9,18 +9,24 @@ import service.ReservationService;
 import java.util.Collection;
 import java.util.List;
 
-public class AdminResource {
+public enum AdminResource {
 
-    private static class AdminResourceHolder {
-        private static final AdminResource instance = new AdminResource();
-    }
-    private AdminResource() {}
-    public static AdminResource getInstance() {
-        return AdminResourceHolder.instance;
-    }
+    /* provide a static reference using enum-singleton */
+    INSTANCE;
 
-    private final CustomerService customerService = CustomerService.getInstance();
-    private final ReservationService reservationService = ReservationService.getInstance();
+//    private static class AdminResourceHolder {
+//        private static final AdminResource instance = new AdminResource();
+//    }
+//    private AdminResource() {}
+//    public static AdminResource getInstance() {
+//        return AdminResourceHolder.instance;
+//    }
+
+    private final CustomerService customerService = CustomerService.INSTANCE;
+    private final ReservationService reservationService = ReservationService.INSTANCE;
+
+//    private final CustomerService customerService = CustomerService.getInstance();
+//    private final ReservationService reservationService = ReservationService.getInstance();
 
     public Customer getCustomer(String email) {
         return customerService.getCustomer(email);

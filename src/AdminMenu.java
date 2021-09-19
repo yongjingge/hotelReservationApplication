@@ -6,7 +6,8 @@ import java.util.Scanner;
 
 public class AdminMenu {
 
-    private static final AdminResource adminResource = AdminResource.getInstance();
+//    private static final AdminResource adminResource = AdminResource.getInstance();
+    private static final AdminResource adminResource = AdminResource.INSTANCE;
 
     /* get a valid integer input from user*/
     private int getAction() {

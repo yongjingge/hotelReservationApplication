@@ -4,17 +4,20 @@ import model.Customer;
 
 import java.util.*;
 
-public class CustomerService {
+public enum CustomerService {
 
-    /* Solution 1: Singleton with nested static class */
-    private static class CustomerServiceHolder {
-        private static final CustomerService instance = new CustomerService();
-    }
+    /* provide a static reference using enum-singleton */
+    INSTANCE;
 
-    private CustomerService() {}
-    public static CustomerService getInstance() {
-        return CustomerServiceHolder.instance;
-    }
+    /* Solution 1: Singleton with static inner class */
+//    private static class CustomerServiceHolder {
+//        private static final CustomerService instance = new CustomerService();
+//    }
+//
+//    private CustomerService() {}
+//    public static CustomerService getInstance() {
+//        return CustomerServiceHolder.instance;
+//    }
 
     private final Map<String, Customer> map = new HashMap<>(); // map<email, customer>
 
@@ -37,24 +40,4 @@ public class CustomerService {
         map.values().forEach(Customer -> emails.add(Customer.getEmail()));
         return emails;
     }
-
-    /* Solution 2: Singleton with Enum */
-    /*
-    INSTANCE;
-    private Map<String, Customer> map;
-
-    public void addCustomer(String email, String firstName, String lastName) {
-        Customer newCustomer = new Customer(firstName, lastName, email);
-        map.put(email, newCustomer);
-    }
-
-    public Customer getCustomer(String input) {
-        String lowercaseInput = input.toLowerCase();
-        return map.containsKey(input) ? map.get(lowercaseInput) : null;
-    }
-
-    public Collection<Customer> getAllCustomers() {
-        return map.values();
-    }
-    */
 }

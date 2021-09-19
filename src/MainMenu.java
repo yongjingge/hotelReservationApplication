@@ -1,4 +1,3 @@
-
 import api.AdminResource;
 import api.HotelResource;
 import model.Customer;
@@ -76,7 +75,8 @@ public class MainMenu {
      */
     /* use LocalDate */
     private void findAndReserveARoom() {
-        HotelResource hotelResource = HotelResource.getInstance();
+//        HotelResource hotelResource = HotelResource.getInstance();
+        HotelResource hotelResource = HotelResource.INSTANCE;
         LocalDate checkIn = getCheckInDate();
         LocalDate checkOut = getCheckOutDate(checkIn);
         String priceTypeRes = getPriceType();
@@ -131,7 +131,8 @@ public class MainMenu {
      */
     private void getReservationsFromEmail() {
         String emailInput = getEmail();
-        HotelResource hotelResource = HotelResource.getInstance();
+//        HotelResource hotelResource = HotelResource.getInstance();
+        HotelResource hotelResource = HotelResource.INSTANCE;
         if (emailExists(emailInput) && !Objects.isNull(hotelResource.getCustomersReservations(emailInput))) {
             hotelResource.getCustomersReservations(emailInput).forEach(System.out::println);
         } else if (! emailExists(emailInput)) {
@@ -264,14 +265,16 @@ public class MainMenu {
 
     /* check if input email exists in the reservation system */
     private boolean emailExists(String email) {
-        AdminResource adminResource = AdminResource.getInstance();
+//        AdminResource adminResource = AdminResource.getInstance();
+        AdminResource adminResource = AdminResource.INSTANCE;
         Set<String> emailsInSystem = new HashSet<>(adminResource.getAllCustomersEmails());
         return emailsInSystem.contains(email);
     }
 
     /* create a new account */
     private String createNewAccount() {
-        HotelResource hotelResource = HotelResource.getInstance();
+//        HotelResource hotelResource = HotelResource.getInstance();
+        HotelResource hotelResource = HotelResource.INSTANCE;
         String email = getEmail();
         String firstName = getName("First Name");
         String lastName = getName("Last Name");
@@ -291,7 +294,8 @@ public class MainMenu {
 
     /* get customer information from email */
     private Customer getCustomerFromEmail(String email) {
-        AdminResource adminResource = AdminResource.getInstance();
+//        AdminResource adminResource = AdminResource.getInstance();
+        AdminResource adminResource = AdminResource.INSTANCE;
         return adminResource.getCustomer(email);
     }
 
@@ -361,7 +365,8 @@ public class MainMenu {
     private String getRoomNumberValid(String msg, LocalDate checkIn, LocalDate checkOut, String priceType) {
         boolean keepAsking = true;
         String res = "";
-        HotelResource hotelResource = HotelResource.getInstance();
+//        HotelResource hotelResource = HotelResource.getInstance();
+        HotelResource hotelResource = HotelResource.INSTANCE;
         while (keepAsking) {
             try {
                 Scanner sc = new Scanner(System.in);

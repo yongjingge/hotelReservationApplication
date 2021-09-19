@@ -7,15 +7,18 @@ import model.Reservation;
 import java.time.LocalDate;
 import java.util.*;
 
-public class ReservationService {
+public enum ReservationService {
 
-    private static class ReservationServiceHolder {
-        private static final ReservationService instance = new ReservationService();
-    }
-    private ReservationService() {}
-    public static ReservationService getInstance() {
-        return ReservationServiceHolder.instance;
-    }
+    /* provide a static reference using enum-singleton */
+    INSTANCE;
+
+//    private static class ReservationServiceHolder {
+//        private static final ReservationService instance = new ReservationService();
+//    }
+//    private ReservationService() {}
+//    public static ReservationService getInstance() {
+//        return ReservationServiceHolder.instance;
+//    }
 
     private final Map<String, IRoom> roomMap = new HashMap<>(); // record rooms and their id in a hashmap
     /* Date  Structures regarding reservations */

@@ -9,18 +9,24 @@ import service.ReservationService;
 import java.time.LocalDate;
 import java.util.Collection;
 
-public class HotelResource {
-    /* provide a static reference */
-    private static class HotelResourceHolder {
-        private static final HotelResource instance = new HotelResource();
-    }
-    private HotelResource() {}
-    public static HotelResource getInstance() {
-        return HotelResourceHolder.instance;
-    }
+public enum HotelResource {
+    /* provide a static reference using enum-singleton */
+    INSTANCE;
 
-    private final CustomerService customerService = CustomerService.getInstance();
-    private final ReservationService reservationService = ReservationService.getInstance();
+/* below is the static-inner-class way of creating a singleton */
+//    private static class HotelResourceHolder {
+//        private static final HotelResource instance = new HotelResource();
+//    }
+//    private HotelResource() {}
+//    public static HotelResource getInstance() {
+//        return HotelResourceHolder.instance;
+//    }
+
+//    private final CustomerService customerService = CustomerService.getInstance();
+//    private final ReservationService reservationService = ReservationService.getInstance();
+
+    private final CustomerService customerService = CustomerService.INSTANCE;
+    private final ReservationService reservationService = ReservationService.INSTANCE;
 
     public Customer getCustomer(String email) {
         return customerService.getCustomer(email);
