@@ -5,14 +5,15 @@ import model.Customer;
 import model.IRoom;
 import model.Reservation;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Pattern;
 
 public class MainMenu {
 
-    private static final Date today = Calendar.getInstance().getTime();
-    private static final SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+    private static final LocalDate today = LocalDate.now();
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
     /* get a valid integer input from user */
     private int getAction() {
@@ -73,22 +74,22 @@ public class MainMenu {
      *  --> display the reservation
      *  --> return to main menu
      */
+    /* use LocalDate */
     private void findAndReserveARoom() {
         HotelResource hotelResource = HotelResource.getInstance();
-        Date checkIn = getCheckInDate();
-        Date checkOut = getCheckOutDate(checkIn);
+        LocalDate checkIn = getCheckInDate();
+        LocalDate checkOut = getCheckOutDate(checkIn);
         String priceTypeRes = getPriceType();
         final Collection<IRoom> roomsAvailableOnRequest = new HashSet<>(hotelResource.findARoom(checkIn, checkOut, priceTypeRes));
-        final Collection<IRoom> roomsAvailableSevenDaysAdded = new HashSet<>(hotelResource.findARoom(addSevenDays(checkIn), addSevenDays(checkOut), priceTypeRes));
+        final Collection<IRoom> roomsAvailableSevenDaysAdded = new HashSet<>(hotelResource.findARoom(checkIn.plusDays(7), checkOut.plusDays(7), priceTypeRes));
 
-        // system based on the dates will list the rooms available for reservation
         if (! roomsAvailableOnRequest.isEmpty()) {
             System.out.println("Rooms available in your selected dates\n");
             roomsAvailableOnRequest.forEach(System.out::println);
         } else if (! roomsAvailableSevenDaysAdded.isEmpty()) {
             System.out.println("""
                     No rooms available in your selected dates
-                    We have rooms available seven day later of your selected dates
+                    We have rooms available seven days later of your choice
                     """);
             roomsAvailableSevenDaysAdded.forEach(System.out::println);
         } else {
@@ -96,39 +97,26 @@ public class MainMenu {
             startActions();
         }
 
-        // user confirm their willingness to book a room
         String yORnBookARoom = getYesOrNoResponse("Would you like to book a room?");
         boolean continueBooking = yORnBookARoom.equalsIgnoreCase("y");
         if (continueBooking) {
             String yORnHaveAccount = getYesOrNoResponse("Do you have an account with us?");
             boolean haveAccount = yORnHaveAccount.equalsIgnoreCase("y");
             String userEmailInput = "";
-            // get account email --> used to make reservations
             if (haveAccount) {
-                // get user email input --> get customer from email, email input has to both match the regex and be inside the system
-                // select a room (from room number input)
-                // display reservation
                 userEmailInput = getEmail();
                 while (! emailExists(userEmailInput)) {
                     System.out.println("Your email does not exist in our system. Please try to enter again or create a new account");
                     userEmailInput = getEmail();
                 }
             } else {
-                // does not have an account, --> create a new account in this block -->
-                // create a new account and return the email of this account
                 userEmailInput = createNewAccount();
             }
 
-            // continue reservations with the email get from above
-            String validRoomNumberInput = getRoomNumberValid("what room number would you like to reserve", checkIn, checkOut, priceTypeRes);
-
-            // make a new reservation and display it
-            Reservation newReservation = !roomsAvailableOnRequest.isEmpty() ?
-                    hotelResource.bookARoom(userEmailInput, hotelResource.getRoom(validRoomNumberInput), checkIn, checkOut) :
-                    hotelResource.bookARoom(userEmailInput, hotelResource.getRoom(validRoomNumberInput), addSevenDays(checkIn), addSevenDays(checkOut));
+            String validRoomNumberInput = getRoomNumberValid("What room number would you like to reserve", checkIn, checkOut, priceTypeRes);
+            Reservation newReservation = !roomsAvailableOnRequest.isEmpty() ? hotelResource.bookARoom(userEmailInput, hotelResource.getRoom(validRoomNumberInput), checkIn, checkOut) : hotelResource.bookARoom(userEmailInput, hotelResource.getRoom(validRoomNumberInput), checkIn.plusDays(7), checkOut.plusDays(7));
             System.out.println(newReservation);
         } else {
-            // answer 'n' to the question: would u like to book a room --> go back to the main menu
             startActions();
         }
         startActions();
@@ -172,10 +160,10 @@ public class MainMenu {
         );
     }
 
-    /* get a valid check-in date from user */
-    private Date getCheckInDate() {
+    /* get a valid check-in date (LocalDate) from user */
+    private LocalDate getCheckInDate() {
         boolean keepAsking = true;
-        Date checkIn = null;
+        LocalDate checkIn = null;
         String[] prints = {
                 "Enter CheckIn Date mm/dd/yyyy example 02/01/2020",
                 "You cannot check in before today. Please re-enter",
@@ -185,10 +173,10 @@ public class MainMenu {
                 System.out.println(prints[0]);
                 Scanner sc = new Scanner(System.in);
                 String inputDate = sc.nextLine();
-                checkIn = formatter.parse(inputDate);
-                if (checkIn.before(today)) {
-                    System.out.println("Your check-in date is " + formatter.format(checkIn));
-                    System.out.println("Today is " + formatter.format(today));
+                checkIn = LocalDate.parse(inputDate, dateTimeFormatter);
+                if (checkIn.isBefore(today)) {
+                    System.out.println("Your check-in date is " + checkIn.format(dateTimeFormatter));
+                    System.out.println("Today is " + today.format(dateTimeFormatter));
                     System.out.println(prints[1]);
                     continue;
                 }
@@ -201,42 +189,32 @@ public class MainMenu {
         return checkIn;
     }
 
-    /* get a valid check-out date from user */
-    private Date getCheckOutDate(Date checkInDate) {
+    /* get a valid check-out date (LocalDate) from user */
+    private LocalDate getCheckOutDate(LocalDate checkInDate) {
         boolean keepAsking = true;
-        Date checkOut = new Date();
+        LocalDate checkOut = null;
         String[] prints = {
                 "Enter CheckOut Date mm/dd/yyyy example 02/01/2020",
                 "You cannot check out before your check-in date. Please re-enter"
         };
-        while (keepAsking) {
+        while(keepAsking) {
             try {
                 System.out.println(prints[0]);
                 Scanner sc = new Scanner(System.in);
                 String inputDate = sc.nextLine();
-                checkOut = formatter.parse(inputDate);
-                if (checkOut.before(checkInDate)) {
-                    System.out.println("Your check-out date is " + formatter.format(checkOut));
-                    System.out.println("Your check-in date is " + formatter.format(checkInDate));
+                checkOut = LocalDate.parse(inputDate, dateTimeFormatter);
+                if (checkOut.isBefore(checkInDate)) {
+                    System.out.println("Your check-out date is " + checkOut.format(dateTimeFormatter));
+                    System.out.println("Your check-in date is " + checkInDate.format(dateTimeFormatter));
                     System.out.println(prints[1]);
                     continue;
                 }
-
             } catch (Exception ex) {
                 System.out.println("Invalid input! " + ex.getLocalizedMessage());
-                continue;
             }
             keepAsking = false;
         }
         return checkOut;
-    }
-
-    /* add 7 days to a given Date argument */
-    private Date addSevenDays(Date d) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(d);
-        c.add(Calendar.DATE, 7);
-        return c.getTime();
     }
 
     /* get a valid yes/no response from user */
@@ -379,8 +357,8 @@ public class MainMenu {
         return res;
     }
 
-    /* get a valid room number for reservation */
-    private String getRoomNumberValid(String msg, Date checkIn, Date checkOut, String priceType) {
+    /* get a valid room number for reservation - use LocalDate */
+    private String getRoomNumberValid(String msg, LocalDate checkIn, LocalDate checkOut, String priceType) {
         boolean keepAsking = true;
         String res = "";
         HotelResource hotelResource = HotelResource.getInstance();
@@ -394,7 +372,7 @@ public class MainMenu {
                     continue;
                 }
                 final Set<IRoom> roomsAvailable = new HashSet<>(hotelResource.findARoom(checkIn, checkOut, priceType));
-                final Set<IRoom> roomsAvailableSevenDaysLater = new HashSet<>(hotelResource.findARoom(addSevenDays(checkIn), addSevenDays(checkOut), priceType));
+                final Set<IRoom> roomsAvailableSevenDaysLater = new HashSet<>(hotelResource.findARoom(checkIn.plusDays(7), checkOut.plusDays(7), priceType));
                 if (roomsAvailable.isEmpty() && roomsAvailableSevenDaysLater.isEmpty()) {
                     System.out.println("No room available, please try again");
                     continue;
@@ -418,5 +396,4 @@ public class MainMenu {
         MainMenu mainMenu = new MainMenu();
         mainMenu.startActions();
     }
-
 }

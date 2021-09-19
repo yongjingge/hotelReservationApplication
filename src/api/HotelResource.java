@@ -6,8 +6,8 @@ import model.Reservation;
 import service.CustomerService;
 import service.ReservationService;
 
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 
 public class HotelResource {
     /* provide a static reference */
@@ -34,15 +34,17 @@ public class HotelResource {
         return reservationService.getARoom(roomNumber);
     }
 
-    public Reservation bookARoom(String customerEmail, IRoom room, Date checkInDate, Date checkOutDate) {
-        return reservationService.reserveARoom(customerService.getCustomer(customerEmail), room, checkInDate, checkOutDate);
+    /* use LocalDate */
+    public Reservation bookARoom(String customEmail, IRoom room, LocalDate checkInDate, LocalDate checkOutDate) {
+        return reservationService.reserveARoom(customerService.getCustomer(customEmail), room, checkInDate, checkOutDate);
     }
 
     public Collection<Reservation> getCustomersReservations(String customerEmail) {
         return reservationService.getCustomersReservationFromCustomer(customerService.getCustomer(customerEmail));
     }
 
-    public Collection<IRoom> findARoom(Date checkIn, Date checkOut, String priceType) {
+    /* use LocalDate */
+    public Collection<IRoom> findARoom(LocalDate checkIn, LocalDate checkOut, String priceType) {
         return reservationService.findRooms(checkIn, checkOut, priceType);
     }
 

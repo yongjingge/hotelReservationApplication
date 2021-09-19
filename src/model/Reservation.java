@@ -1,18 +1,18 @@
 package model;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Reservation {
 
     private Customer customer;
     private IRoom room;
-    private Date checkInDate;
-    private Date checkOutDate;
-    private static final SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
-    public Reservation(Customer customer, IRoom room, Date checkInDate, Date checkOutDate) {
+    public Reservation(Customer customer, IRoom room, LocalDate checkInDate, LocalDate checkOutDate) {
         this.customer = customer;
         this.room = room;
         this.checkInDate = checkInDate;
@@ -21,7 +21,7 @@ public class Reservation {
 
     @Override
     public String toString() {
-        return "Name:\n" + customer.getFirstName() + " " + customer.getLastName() + "\n" + "Room:\n" + room + "starts on " + formatter.format(checkInDate) + "\nends on " + formatter.format(checkOutDate) + "\n";
+        return "Name:\n" + customer.getFirstName() + " " + customer.getLastName() + "\n" + "Room:\n" + room + "starts on " + checkInDate.format(dateTimeFormatter) + "\nends on " + checkOutDate.format(dateTimeFormatter) + "\n";
     }
 
     @Override
@@ -58,19 +58,19 @@ public class Reservation {
         this.room = room;
     }
 
-    public Date getCheckInDate() {
+    public LocalDate getCheckInDate() {
         return checkInDate;
     }
 
-    public void setCheckInDate(Date checkInDate) {
+    public void setCheckInDate(LocalDate checkInDate) {
         this.checkInDate = checkInDate;
     }
 
-    public Date getCheckOutDate() {
+    public LocalDate getCheckOutDate() {
         return checkOutDate;
     }
 
-    public void setCheckOutDate(Date checkOutDate) {
+    public void setCheckOutDate(LocalDate checkOutDate) {
         this.checkOutDate = checkOutDate;
     }
 }

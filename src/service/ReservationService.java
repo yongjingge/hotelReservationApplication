@@ -4,6 +4,7 @@ import model.Customer;
 import model.IRoom;
 import model.Reservation;
 
+import java.time.LocalDate;
 import java.util.*;
 
 public class ReservationService {
@@ -38,7 +39,7 @@ public class ReservationService {
         return roomMap.containsKey(roomNumber) && !Objects.isNull(roomMap.get(roomNumber));
     }
 
-    public Reservation reserveARoom(Customer customer, IRoom room, Date checkInDate, Date checkOutDate) {
+    public Reservation reserveARoom(Customer customer, IRoom room, LocalDate checkInDate, LocalDate checkOutDate) {
         Reservation newReservation = new Reservation(customer, room, checkInDate, checkOutDate);
         reservationSet.add(newReservation);
         reservationMap.computeIfAbsent(room.getRoomNumber(), k -> new ArrayList<>()).add(newReservation);
@@ -47,13 +48,13 @@ public class ReservationService {
     }
 
     /* default access modifier example */
-    boolean dateConflict(Date checkInDate, Date checkOutDate, Reservation reservation) {
-        return checkInDate.before(reservation.getCheckOutDate()) &&
-                checkOutDate.after(reservation.getCheckInDate());
+    boolean dateConflict(LocalDate checkInDate, LocalDate checkOutDate, Reservation reservation) {
+        return checkInDate.isBefore(reservation.getCheckOutDate()) &&
+                checkOutDate.isAfter(reservation.getCheckInDate());
     }
 
     /* used inside this class to find rooms available with provided check-n/out dates, price type is not checked */
-    private Collection<IRoom> findRooms(Date checkInDate, Date checkOutDate) {
+    private Collection<IRoom> findRooms(LocalDate checkInDate, LocalDate checkOutDate) {
         Collection<IRoom> availableRooms = getAllRooms();
         List<IRoom> res = new ArrayList<>(availableRooms);
         if (reservationSet.isEmpty()) {
@@ -68,7 +69,7 @@ public class ReservationService {
     }
 
     /* this method will include options of free, paid, all for room reservations */
-    public Collection<IRoom> findRooms(Date checkInDate, Date checkOutDate, String priceType) {
+    public Collection<IRoom> findRooms(LocalDate checkInDate, LocalDate checkOutDate, String priceType) {
         Collection<IRoom> availableRooms = new ArrayList<>(findRooms(checkInDate, checkOutDate));
         if (priceType.equals("all")) {
             return availableRooms;
